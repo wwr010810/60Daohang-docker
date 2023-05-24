@@ -1,0 +1,40 @@
+version: '3'
+services:
+    nginx:
+        image: nginx:latest
+        depends_on:
+            - "php"
+        ports:
+            - <target_port>:<target_port>
+        volumes:
+            - "./conf.d:/etc/nginx/conf.d"
+            - "./html:/var/www/html"
+        networks:
+            app_net:
+                ipv4_address: 10.10.10.5
+        container_name: "navpage-nginx"
+    php:
+        image: caomingjun/navpage
+        user: 1000:1000
+        volumes:
+            - "./html:/var/www/html"
+        networks:
+            - app_net
+        container_name: "navpage-php"
+    mysql:
+        image: mysql:5.6
+        environment:
+            - MYSQL_ROOT_PASSWORD=<mysql_password>
+            - MYSQL_DATABASE=navpage
+        volumes:
+          - './sqldata:/var/lib/mysql'
+        networks:
+            app_net:
+                ipv4_address: 10.10.10.4
+        container_name: "navpage-mysql"
+networks:
+    app_net:
+        driver: bridge
+        ipam:
+            config:
+                - subnet: 10.10.0.0/16
